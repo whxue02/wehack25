@@ -1,75 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react' 
+import { useNavigate } from 'react-router-dom' 
 
 export default function Share() {
-    const [albums, setAlbums] = useState([]);  // Initialize albums as an empty array
-    const [albumName, setAlbumName] = useState('');
-    const [collaborators, setCollaborators] = useState('');
-    const navigate = useNavigate();
+    // initialize variables
+    const [albums, setAlbums] = useState([])   
+    const [albumName, setAlbumName] = useState('') 
+    const [collaborators, setCollaborators] = useState('') 
+    const navigate = useNavigate() 
 
-    // Fetch albums of the logged-in user
+    // get albums of user
     useEffect(() => {
         const fetchAlbums = async () => {
-            const username = 'whxue'; // Replace with the logged-in user dynamically
-            const response = await fetch(`http://127.0.0.1:5000/getAlbums?username=${username}`);
-            const data = await response.json();
-            if (Array.isArray(data)) {  // Ensure that data is an array
-                setAlbums(data);
+            const username = 'whxue'  // will replace with user when auth is implemented
+            const response = await fetch(`http://127.0.0.1:5000/getAlbums?username=${username}`) 
+            const data = await response.json() 
+            if (Array.isArray(data)) {  // make sure that data is an array
+                setAlbums(data) 
             } else {
-                setAlbums([]);  // Set to empty array if data is not in expected format
+                setAlbums([])   // empty array else
             }
-        };
+        } 
 
-        fetchAlbums();
-    }, []);
+        fetchAlbums() 
+    }, []) 
 
-    // Handle form submission to create a new album
+    // create new album
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault() 
 
-        // Parse collaborators from the input
-        const collaboratorList = collaborators.split(',').map((user) => user.trim());
+        // get collaborators from input
+        const collaboratorList = collaborators.split(',').map((user) => user.trim()) 
 
-        // Creating a new album object
+        // make a new album object
         const newAlbum = {
             albumID: albumName.toLowerCase().replace(' ', '_'), // Example albumID generation
             name: albumName,
             pictures: [],
             collaborators: collaboratorList
-        };
+        } 
 
 
-        // Send request to backend to create a new album
+        // send request to create a new album
         const response = await fetch('http://127.0.0.1:5000/createAlbum', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(newAlbum)
-        });
+        }) 
 
         if (response.ok) {
-            const data = await response.json();
+            const data = await response.json() 
             const addedAlbum = data.album
-            setAlbums((prevAlbums) => [...prevAlbums, newAlbum]);  // Add the new album to the albums list
+            setAlbums((prevAlbums) => [...prevAlbums, newAlbum])   
             console.log(albums)
         } else {
-            const errorData = await response.json();
-            alert(errorData.error);
+            const errorData = await response.json() 
+            alert(errorData.error) 
         }
-    };
+    } 
 
-    // Handle clicking on a box to go to the album page
+    // handle clicking on a box to go to the album page
     const handleBoxClick = (albumID) => {
-        navigate(`/album/${albumID}`); // Navigate to album page
-    };
+        navigate(`/album/${albumID}`)  // navigate to album page
+    } 
 
     return (
         <section id="Share" className="screen shareBackground">
             <div className="sharecontainer">
-                {/* Left Side - Form */}
+                {/* left side */}
                 <div className="left">
-                    <h1 className="shareTitle">New Album</h1>
+                    <h1 className="shareTitle">New Album</h1 >
                     <form className="form" onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label>Album Name</label>
@@ -93,7 +94,7 @@ export default function Share() {
                     </form>
                 </div>
 
-                {/* Right Side - Scrollable Grid */}
+                {/* right side  */}
                 <div className="right">
                     <div className="box-grid">
                         {albums && Array.isArray(albums) && albums.map((album, index) => (
@@ -110,5 +111,5 @@ export default function Share() {
                 </div>
             </div>
         </section>
-    );
+    ) 
 }

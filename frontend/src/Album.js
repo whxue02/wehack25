@@ -1,209 +1,215 @@
-import { Link, useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import "./cheryl.css";
+import { Link, useParams, useNavigate } from "react-router-dom" 
+import { useState, useEffect } from "react" 
+import "./cheryl.css" 
 
 export default function Album() {
-    const { albumID } = useParams();
-    const navigate = useNavigate();
-    const [album, setAlbum] = useState(null);
-    const [showPopup, setShowPopup] = useState(false);
-    const [showUploadPopup, setShowUploadPopup] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [comments, setComments] = useState([]);
-    const [newComment, setNewComment] = useState('');
-    const [timeCapsuleDate, setTimeCapsuleDate] = useState('');
-    const [capsuleDescription, setCapsuleDescription] = useState('');
-    const [pictureID, setID] = useState("");
-    const [newImage, setNewImage] = useState(null); // State for the new image
+    // initialize variables
+    const { albumID } = useParams() 
+    const navigate = useNavigate() 
+    const [album, setAlbum] = useState(null) 
+    const [showPopup, setShowPopup] = useState(false) 
+    const [showUploadPopup, setShowUploadPopup] = useState(false) 
+    const [selectedImage, setSelectedImage] = useState(null) 
+    const [comments, setComments] = useState([]) 
+    const [newComment, setNewComment] = useState('') 
+    const [timeCapsuleDate, setTimeCapsuleDate] = useState('') 
+    const [capsuleDescription, setCapsuleDescription] = useState('') 
+    const [pictureID, setID] = useState("") 
+    const [newImage, setNewImage] = useState(null) 
 
+    // get pictures from album
     useEffect(() => {
         const fetchAlbumDetails = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:5000/getAlbumDetails?albumID=${albumID}`);
-                const data = await response.json();
+                const response = await fetch(`http://127.0.0.1:5000/getAlbumDetails?albumID=${albumID}`) 
+                const data = await response.json() 
                 if (response.ok) {
-                    setAlbum(data);
+                    setAlbum(data) 
                 } else {
-                    console.error(data.error);
+                    console.error(data.error) 
                 }
             } catch (err) {
-                console.error("Error fetching album:", err);
+                console.error("Error fetching album:", err) 
             }
-        };
+        } 
 
-        fetchAlbumDetails();
-    }, [showPopup, showUploadPopup]);
+        fetchAlbumDetails() 
+    }, [showPopup, showUploadPopup]) 
 
+    // when user clicks on a picture, get all info about the pic
     const handleBoxClick = (img, pictureComments, id) => {
         console.log(album)
-        setSelectedImage(img);
-        setComments(pictureComments || []);
+        setSelectedImage(img) 
+        setComments(pictureComments || []) 
         setID(id)
-        setShowPopup(true);
+        setShowPopup(true) 
         console.log(comments)
-    };
+    } 
 
+    // handle adding a comment
     const addComment = async (e) => {
-        e.preventDefault();
-        if (!newComment.trim()) return;
+        e.preventDefault() 
+        if (!newComment.trim()) return 
     
         const commentData = {
             albumID: albumID,  
             comment: newComment,
             name: 'cheryl',
             pictureID: pictureID,
-        };
+        } 
 
         console.log(commentData)
     
         try {
-            // Sending the comment to the backend
+            // sent to back
             const response = await fetch('http://127.0.0.1:5000/addComment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(commentData),
-            });
+            }) 
     
             if (!response.ok) {
-                throw new Error('Failed to add comment');
+                throw new Error('Failed to add comment') 
             }
     
-            const data = await response.json();
+            const data = await response.json() 
     
-            // Update the UI with the new comment
-            setComments([...comments, commentData]);
-            setNewComment('');  // Reset the comment input field
+            // update with the new comment
+            setComments([...comments, commentData]) 
+            setNewComment('')  
         } catch (error) {
-            console.error("Error adding comment:", error);
+            console.error("Error adding comment:", error) 
         }
-    };
+    } 
     
-
+    // delete album
     const deleteAlbum = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault()  
         try {
             const response = await fetch("http://127.0.0.1:5000/deleteAlbum", {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ albumID })
-            });
-            const data = await response.json();
+            }) 
+            const data = await response.json() 
             if (response.ok) {
-                alert("Album deleted successfully!");
-                navigate("/"); // Redirect to homepage or other page after deletion
+                alert("Album deleted successfully!") 
+                navigate("/") 
             } else {
-                alert(data.error || "Error deleting album");
+                alert(data.error || "Error deleting album") 
             }
         } catch (err) {
-            console.error("Error deleting album:", err);
-            alert("Error deleting album");
+            console.error("Error deleting album:", err) 
+            alert("Error deleting album") 
         }
-    };
+    } 
 
+    // delete photo by id
     const deletePhoto = async (pictureID) => {
         try {
             const response = await fetch("http://127.0.0.1:5000/deletePicture", {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ albumID, pictureID })
-            });
-            const data = await response.json();
+            }) 
+            const data = await response.json() 
             if (response.ok) {
                 setAlbum((prevAlbum) => ({
                     ...prevAlbum,
                     pictures: prevAlbum.pictures.filter((pic) => pic.pictureID !== pictureID)
-                }));
-                alert("Photo deleted successfully!");
-                setShowPopup(false); 
+                })) 
+                alert("Photo deleted successfully!") 
+                setShowPopup(false)  
             } else {
-                alert(data.error || "Error deleting photo");
+                alert(data.error || "Error deleting photo") 
             }
         } catch (err) {
-            console.error("Error deleting photo:", err);
-            alert("Error deleting photo");
+            console.error("Error deleting photo:", err) 
+            alert("Error deleting photo") 
         }
-    };
+    } 
 
+    // update file upload information
     const handleFileChange = (e) => {
-        setNewImage(e.target.files[0]);
-    };
-
-    const handleUpload = async () => {
-        if (!newImage) return;
+        setNewImage(e.target.files[0]) 
+    } 
     
-        const formData = new FormData();
-        formData.append("image", newImage);
-        formData.append("albumID", albumID);
+    // handle submitting new pictire
+    const handleUpload = async () => {
+        if (!newImage) return 
+    
+        const formData = new FormData() 
+        formData.append("image", newImage) 
+        formData.append("albumID", albumID) 
     
         try {
             const response = await fetch("http://127.0.0.1:5000/uploadPicture", {
                 method: "POST",
                 body: formData,
-            });
+            }) 
     
-            // Log the full response to see if there are any error details
-            const textResponse = await response.text();
-            console.log(textResponse); // Logs the raw text response
+            const textResponse = await response.text() 
     
-            const data = JSON.parse(textResponse); // Try to parse it manually if it's valid JSON
+            const data = JSON.parse(textResponse) 
+
             if (response.ok) {
-                alert("Picture uploaded successfully!");
-                setShowUploadPopup(false); // Close the upload popup
+                alert("Picture uploaded successfully!") 
+                setShowUploadPopup(false)  
                 setAlbum((prevAlbum) => ({
                     ...prevAlbum,
-                    pictures: [...prevAlbum.pictures, data.picture] // Add the new picture to the album
-                }));
+                    pictures: [...prevAlbum.pictures, data.picture] 
+                })) 
             } else {
-                alert(data.error || "Error uploading picture");
+                alert(data.error || "Error uploading picture") 
             }
         } catch (err) {
-            console.error("Error uploading picture:", err);
-            alert("Error uploading picture");
+            console.error("Error uploading picture:", err) 
+            alert("Error uploading picture") 
         }
-    };
+    } 
 
+    // handles creating a new time capsule
     const handleTimeCapsuleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault() 
     
-        // Make sure all fields are filled
         if (!timeCapsuleDate || !capsuleDescription) {
-            alert("Please fill out both fields.");
-            return;
+            alert("Please fill out both fields.") 
+            return 
         }
     
         const timeCapsuleData = {
             date: timeCapsuleDate,
             description: capsuleDescription,
-            imageID: pictureID, // This should be the ID of the image to which the time capsule is being added
-            username: "whxue", // Replace with the logged-in user's username, if needed
-            imagePath: selectedImage, // Image path
-        };
+            imageID: pictureID, 
+            username: "whxue", // replace with user once auth is there
+            imagePath: selectedImage,
+        } 
     
         try {
-            // Send the time capsule data to the backend
+            // send the time capsule data to the backend
             const response = await fetch("http://127.0.0.1:5000/addTimeCapsule", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(timeCapsuleData),
-            });
+            }) 
     
             if (response.ok) {
-                const data = await response.json();
-                alert("Time capsule added successfully!");
-                setShowPopup(false); // Close the popup
+                const data = await response.json() 
+                alert("Time capsule added successfully!") 
+                setShowPopup(false) 
             } else {
-                const errorData = await response.json();
-                alert(errorData.error || "Failed to add time capsule.");
+                const errorData = await response.json() 
+                alert(errorData.error || "Failed to add time capsule.") 
             }
         } catch (err) {
-            console.error("Error adding time capsule:", err);
-            alert("Error adding time capsule.");
+            console.error("Error adding time capsule:", err) 
+            alert("Error adding time capsule.") 
         }
-    };
+    } 
     
 
     return (
@@ -253,7 +259,7 @@ export default function Album() {
                             </div>
                         ))}
 
-                        {/* Upload box */}
+                        {/* upload box */}
                         <div className="box-wrapper" onClick={() => setShowUploadPopup(true)}>
                             <div className="albumBox">
                                 <img
@@ -267,7 +273,7 @@ export default function Album() {
                     </div>
                 </div>
 
-                {/* Upload popup */}
+                {/* upload popup */}
                 {showUploadPopup && (
                     <div className="modal-overlay" onClick={() => setShowUploadPopup(false)}>
                         <div className="modal-content upload" onClick={(e) => e.stopPropagation()}>
@@ -279,7 +285,7 @@ export default function Album() {
                     </div>
                 )}
 
-                {/* Popup for selected image */}
+                {/* popup for image */}
                 {showPopup && (
                     <div className="modal-overlay" onClick={() => setShowPopup(false)}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -334,5 +340,5 @@ export default function Album() {
                 )}
             </div>
         </div>
-    );
+    ) 
 }

@@ -73,19 +73,19 @@ def getAlbums():
         return jsonify({"error": "Username is required"}), 400
     
     try:
-        # Find albums where the username exists in the collaborators array
+        # find albums where the username exists in the collaborators array
         albums = list(dba["albums"].find({"collaborators": username}, {"_id": 0}))
         
-        # If no albums are found for the username, return a message
+        # if no, error
         if not albums:
             print("No albums found for this username.")
         
-        return jsonify(albums)  # Return the found albums as JSON
+        return jsonify(albums)  
     except Exception as e:
         print(f"Error in getAlbums: {str(e)}")
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
-
+# get all time capsules for user
 @app.route("/getTimeCapsules", methods=["GET"])
 def getTime():
     username = request.args.get("username")
@@ -93,11 +93,10 @@ def getTime():
     try:
         capsules = list(dbt["time"].find({"username": username}, {"_id": 0}))
         for capsule in capsules:
-            # If date is a string, try to parse it into a datetime object
+            # convert string to iso format
             if isinstance(capsule["date"], str):
-                # Attempt to parse the date string into a datetime object
                 capsule["date"] = datetime.fromisoformat(capsule["date"]) if capsule["date"] else None
-            # If it's a datetime object, just convert it to an ISO string
+            # if it's a datetime object, just convert it to an ISO string
             elif isinstance(capsule["date"], datetime):
                 capsule["date"] = capsule["date"].isoformat()
         return jsonify(capsules)
@@ -147,7 +146,7 @@ def addPhoto():
     
 @app.route('/addComment', methods=['POST'])
 def add_comment():
-    data = request.json  # Expecting a JSON body with the albumID, pictureID, and comment
+    data = request.json  
     album_id = data.get("albumID")
     picture_id = data.get("pictureID")
     comment = data.get("comment")
@@ -156,29 +155,29 @@ def add_comment():
     if not album_id or not picture_id or not comment or not name:
         return jsonify({"error": "Missing required data"}), 400
     
-    # Find the album in the database
+    # find the album in the database
     album = dba["albums"].find_one({"albumID": album_id})
     if not album:
         return jsonify({"error": "Album not found"}), 404
     
-    # Find the specific picture by pictureID
+    # find the specific picture by pictureID
     picture = next((pic for pic in album["pictures"] if pic["pictureID"] == picture_id), None)
     if not picture:
         return jsonify({"error": "Picture not found"}), 404
     
-    # Add the comment to the picture's comments array
+    # add the comment to the picture's comments array
     new_comment = {
         "name": name,
         "comment": comment,
     }
     
-    # Push the new comment to the comments array of the specific picture
+    # push the new comment to the comments array of the specific picture
     dba["albums"].update_one(
         {"albumID": album_id, "pictures.pictureID": picture_id},
         {"$push": {"pictures.$.comments": new_comment}}
     )
     
-    # Return the updated comments for the specific picture
+    # return the updated comments for the specific picture
     updated_picture = dba["albums"].find_one({"albumID": album_id, "pictures.pictureID": picture_id})
     updated_comments = updated_picture["pictures"]
     
@@ -186,14 +185,14 @@ def add_comment():
 
 @app.route('/addTimeCapsule', methods=['POST'])
 def add_time_capsule():
-    data = request.json  # Expecting a JSON body with the time capsule data
-    # Validation: Check for missing required fields
+    data = request.json  
+    # check for missing required fields
     required_fields = [ "date", "description", "imageID", "username", "imagePath"]
     for field in required_fields:
         if field not in data:
             return jsonify({"error": f"Missing required field: {field}"}), 400
     
-    # Construct the time capsule document to insert into the database
+    # make data
     time_capsule = {
         "capsuleID": generate_picture_id(),
         "date": data["date"],
@@ -204,13 +203,13 @@ def add_time_capsule():
     }
     
     try:
-        # Insert the time capsule document into the database
+        # insert
         result = dbt["time"].insert_one(time_capsule)
         
-        # Extract the inserted ID and include it in the response
-        time_capsule['_id'] = str(result.inserted_id)  # Convert ObjectId to string
+        # convert objID into string
+        time_capsule['_id'] = str(result.inserted_id)  
         
-        # Return the success response
+
         return jsonify({
             "message": "Time capsule added successfully",
             "timeCapsule": time_capsule
@@ -242,17 +241,16 @@ def deletePhoto():
     print(data)
     
     try:
-        # Find the album by albumID
+        # find the album by albumID
         existing_album = dba["albums"].find_one({"albumID": data["albumID"]})
         if not existing_album:
             return jsonify({"error": "Album ID does not exist"}), 400
 
-        # Ensure that pictureID is provided
         picture_id = data.get("pictureID")
         if not picture_id:
             return jsonify({"error": "pictureID is required"}), 400
         
-        # Pull the picture(s) by matching pictureID
+        # delete photo
         dba["albums"].update_one(
             {"albumID": data["albumID"]},
             {"$pull": {"pictures": {"pictureID": picture_id}}}
@@ -271,8 +269,7 @@ def upload_picture():
     if file.filename == '':
         return jsonify({"error": "No selected file"})
     
-    # Get the albumID from the form data or request body
-    album_id = request.form.get("albumID")  # or request.json.get("albumID") if you are sending JSON data
+    album_id = request.form.get("albumID") 
 
     if not album_id:
         return jsonify({"error": "No album ID provided"}), 400
@@ -281,25 +278,24 @@ def upload_picture():
         filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
         
-        # Simulate the picture data
+
         picture_data = {
             "pictureID": generate_picture_id(),
-            "picturePath": f'http://127.0.0.1:5000/{filename}',  # Ensure this is the correct path
+            "picturePath": f'http://127.0.0.1:5000/{filename}',  
             "comments": [],
         }
         
-        # Find the album by albumID
+
         existing_album = dba["albums"].find_one({"albumID": album_id})
         if not existing_album:
             return jsonify({"error": "Album ID does not exist"}), 400
 
-        # Update the album with the new picture
+
         dba["albums"].update_one(
             {"albumID": album_id},
             {"$push": {"pictures": picture_data}}
         )
 
-        # Return the new picture data as JSON
         return jsonify({"picture": picture_data})
 
     return jsonify({"error": "Invalid file type"})

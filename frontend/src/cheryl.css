@@ -1,4 +1,4 @@
-/* Reset default styles */
+
 * {
     margin: 0;
     padding: 0;
@@ -10,7 +10,7 @@
     height: 100%;
     font-family: 'Kodé Mono', monospace;
     overflow-x: hidden;
-    scroll-snap-type: y mandatory; /* Snap on body */
+    scroll-snap-type: y mandatory; 
     scroll-behavior: smooth;
   }
   
@@ -64,7 +64,7 @@
     color: #0d0d0c;
   }
   
-/* Landing page specific styling */
+/* landing page */
 .landingImage {
   height: 100vh;
   width: 100vw
@@ -116,18 +116,17 @@
   }
   
 
-  /* Each section takes up full screen height */
+  /* snap scrolling */
   .screen {
     scroll-snap-align: start;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 50px; /* Push content below navbar */
+    padding-top: 50px; 
 
   }
   
-  /* Section content layout */
   .left-container, .right-container {
     width: 50%;
     padding: 20px;
@@ -183,14 +182,14 @@
     overflow: hidden;
   }
   
-  /* Container splits screen */
+
 .sharecontainer {
   display: flex;
   height: 100vh;
   width: 100vw;
 }
 
-/* Left side */
+
 .left {
   width: 50%;
   padding: 40px;
@@ -233,7 +232,6 @@ button {
   font-size: 16px;
 }
 
-/* Right side */
 .right {
   width: 50%;
   overflow-y: auto;
@@ -241,7 +239,7 @@ button {
   box-sizing: border-box;
 }
 
-/* Box Grid */
+
 .box-grid {
   margin-top: 5%;
   display: grid;
@@ -293,14 +291,14 @@ button {
   overflow: hidden;
 }
 
-/* Full page layout */
+
 .page-container {
   display: flex;
   height: 100vh;
   width: 100vw;
 }
 
-/* Left side - boxes */
+
 .left-side {
   width: 50%;
   overflow-y: auto;
@@ -323,7 +321,6 @@ button {
   font-size: 14px;
 }
 
-/* Right side - title and countdown */
 .right-side {
   width: 50%;
   padding: 60px;
@@ -414,7 +411,7 @@ button {
   margin-top: 1rem;
 }
 
-/* Comments */
+/* comments */
 .comments-section {
   margin-bottom: 20px;
 }
@@ -431,7 +428,6 @@ button {
   width: 100%
 }
 
-/* Add Comment Form */
 .add-comment-form {
   display: block;
   gap: 10px;
@@ -451,7 +447,6 @@ button {
   margin-top: 10px;
 }
 
-/* Time Capsule Form */
 .time-capsule-form {
   display: flex;
   flex-direction: column;
@@ -509,7 +504,6 @@ h3 {
   margin-top: 0px
 }
 
-/* Title */
 .uploadTitle {
   font-size: 40px;
   font-weight: bold;
@@ -518,7 +512,7 @@ h3 {
   text-align: center;
 }
 
-/* File Input */
+
 input[type="file"] {
   background-color: #f8f8f8;
   border: 2px solid #ddd;
@@ -530,7 +524,6 @@ input[type="file"] {
   color: #333;
 }
 
-/* Buttons */
 .upload-button, .cancel-button {
   width: 100%;
   padding: 12px;
