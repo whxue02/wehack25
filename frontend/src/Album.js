@@ -2,16 +2,19 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./cheryl.css";
 
-export default function Home() {
+export default function Album() {
     const { albumID } = useParams();
     const navigate = useNavigate();
     const [album, setAlbum] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
+    const [showUploadPopup, setShowUploadPopup] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [timeCapsuleDate, setTimeCapsuleDate] = useState('');
+    const [capsuleDescription, setCapsuleDescription] = useState('');
     const [pictureID, setID] = useState("");
+    const [newImage, setNewImage] = useState(null); // State for the new image
 
     useEffect(() => {
         const fetchAlbumDetails = async () => {
@@ -29,21 +32,54 @@ export default function Home() {
         };
 
         fetchAlbumDetails();
-    }, [albumID]);
+    }, [showPopup, showUploadPopup]);
 
     const handleBoxClick = (img, pictureComments, id) => {
+        console.log(album)
         setSelectedImage(img);
         setComments(pictureComments || []);
         setID(id)
         setShowPopup(true);
+        console.log(comments)
     };
 
-    const addComment = (e) => {
+    const addComment = async (e) => {
         e.preventDefault();
         if (!newComment.trim()) return;
-        setComments([...comments, { user: 'You', text: newComment }]);
-        setNewComment('');
+    
+        const commentData = {
+            albumID: albumID,  
+            comment: newComment,
+            name: 'cheryl',
+            pictureID: pictureID,
+        };
+
+        console.log(commentData)
+    
+        try {
+            // Sending the comment to the backend
+            const response = await fetch('http://127.0.0.1:5000/addComment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(commentData),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to add comment');
+            }
+    
+            const data = await response.json();
+    
+            // Update the UI with the new comment
+            setComments([...comments, commentData]);
+            setNewComment('');  // Reset the comment input field
+        } catch (error) {
+            console.error("Error adding comment:", error);
+        }
     };
+    
 
     const deleteAlbum = async (e) => {
         e.preventDefault(); 
@@ -80,6 +116,7 @@ export default function Home() {
                     pictures: prevAlbum.pictures.filter((pic) => pic.pictureID !== pictureID)
                 }));
                 alert("Photo deleted successfully!");
+                setShowPopup(false); 
             } else {
                 alert(data.error || "Error deleting photo");
             }
@@ -88,6 +125,86 @@ export default function Home() {
             alert("Error deleting photo");
         }
     };
+
+    const handleFileChange = (e) => {
+        setNewImage(e.target.files[0]);
+    };
+
+    const handleUpload = async () => {
+        if (!newImage) return;
+    
+        const formData = new FormData();
+        formData.append("image", newImage);
+        formData.append("albumID", albumID);
+    
+        try {
+            const response = await fetch("http://127.0.0.1:5000/uploadPicture", {
+                method: "POST",
+                body: formData,
+            });
+    
+            // Log the full response to see if there are any error details
+            const textResponse = await response.text();
+            console.log(textResponse); // Logs the raw text response
+    
+            const data = JSON.parse(textResponse); // Try to parse it manually if it's valid JSON
+            if (response.ok) {
+                alert("Picture uploaded successfully!");
+                setShowUploadPopup(false); // Close the upload popup
+                setAlbum((prevAlbum) => ({
+                    ...prevAlbum,
+                    pictures: [...prevAlbum.pictures, data.picture] // Add the new picture to the album
+                }));
+            } else {
+                alert(data.error || "Error uploading picture");
+            }
+        } catch (err) {
+            console.error("Error uploading picture:", err);
+            alert("Error uploading picture");
+        }
+    };
+
+    const handleTimeCapsuleSubmit = async (e) => {
+        e.preventDefault();
+    
+        // Make sure all fields are filled
+        if (!timeCapsuleDate || !capsuleDescription) {
+            alert("Please fill out both fields.");
+            return;
+        }
+    
+        const timeCapsuleData = {
+            date: timeCapsuleDate,
+            description: capsuleDescription,
+            imageID: pictureID, // This should be the ID of the image to which the time capsule is being added
+            username: "whxue", // Replace with the logged-in user's username, if needed
+            imagePath: selectedImage, // Image path
+        };
+    
+        try {
+            // Send the time capsule data to the backend
+            const response = await fetch("http://127.0.0.1:5000/addTimeCapsule", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(timeCapsuleData),
+            });
+    
+            if (response.ok) {
+                const data = await response.json();
+                alert("Time capsule added successfully!");
+                setShowPopup(false); // Close the popup
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || "Failed to add time capsule.");
+            }
+        } catch (err) {
+            console.error("Error adding time capsule:", err);
+            alert("Error adding time capsule.");
+        }
+    };
+    
 
     return (
         <div className="albumBackground">
@@ -133,12 +250,36 @@ export default function Home() {
                                         className="albumBox-image"
                                     />
                                 </div>
-                                <p className="albumBox-label">Picture {pic.pictureID || i + 1}</p>
                             </div>
                         ))}
+
+                        {/* Upload box */}
+                        <div className="box-wrapper" onClick={() => setShowUploadPopup(true)}>
+                            <div className="albumBox">
+                                <img
+                                    src="/images/uploads.png"
+                                    alt="Upload New"
+                                    className="albumBox-image"
+                                />
+                            </div>
+                            <p className="albumBox-label">Upload New Picture</p>
+                        </div>
                     </div>
                 </div>
 
+                {/* Upload popup */}
+                {showUploadPopup && (
+                    <div className="modal-overlay" onClick={() => setShowUploadPopup(false)}>
+                        <div className="modal-content upload" onClick={(e) => e.stopPropagation()}>
+                            <h3 className="uploadTitle">Upload New Picture</h3>
+                            <input type="file" onChange={handleFileChange} />
+                            <button onClick={handleUpload} className="upload-button">Upload</button>
+                            <button onClick={() => setShowUploadPopup(false)} className="cancel-button">Cancel</button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Popup for selected image */}
                 {showPopup && (
                     <div className="modal-overlay" onClick={() => setShowPopup(false)}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -169,16 +310,23 @@ export default function Home() {
                                     <button className="commentButton" type="submit">Post</button>
                                 </form>
 
-                                <form className="time-capsule-form">
-                                    <label htmlFor="capsule-date">Add to Time Capsule:</label>
-                                    <input
-                                        type="date"
-                                        id="capsule-date"
-                                        value={timeCapsuleDate}
-                                        onChange={(e) => setTimeCapsuleDate(e.target.value)}
-                                    />
-                                    <button className="timeButton" type="submit">Save Date</button>
-                                </form>
+                                <form className="time-capsule-form" onSubmit={handleTimeCapsuleSubmit}>
+                                <label htmlFor="capsule-date">Add to Time Capsule:</label>
+                                <input
+                                    type="date"
+                                    id="capsule-date"
+                                    value={timeCapsuleDate}
+                                    onChange={(e) => setTimeCapsuleDate(e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    id="capsule-description"
+                                    placeholder="Enter your description"
+                                    value={capsuleDescription}
+                                    onChange={(e) => setCapsuleDescription(e.target.value)}
+                                />
+                                <button className="timeButton" type="submit">Save Date</button>
+                            </form>
                                 <button onClick={() => deletePhoto(pictureID)} className="delete-photo-button">Delete Photo</button>
                             </div>
                         </div>

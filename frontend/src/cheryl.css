@@ -445,7 +445,7 @@ button {
 
 .add-comment-form button {
   padding: 8px 16px;
-  background-color: #007bff;
+  background-color: #2C5257;
   color: white;
   border: none;
   margin-top: 10px;
@@ -466,7 +466,7 @@ button {
 
 .time-capsule-form button {
   padding: 8px;
-  background-color: #28a745;
+  background-color: #2C5257;
   color: white;
   border: none;
 }
@@ -491,7 +491,7 @@ h3 {
 
 .delete-album-button {
   padding: 8px;
-  background-color: #28a745;
+  background-color: #9D3D3E;
   color: white;
   border: none;
   margin-top: 10px
@@ -499,7 +499,7 @@ h3 {
 
 .delete-photo-button {
   padding: 8px;
-  background-color: #28a745;
+  background-color: #9D3D3E;
   color: white;
   border: none;
   margin-bottom: 20px
@@ -507,4 +507,54 @@ h3 {
 
 .edit-album-submit {
   margin-top: 0px
+}
+
+/* Title */
+.uploadTitle {
+  font-size: 40px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+/* File Input */
+input[type="file"] {
+  background-color: #f8f8f8;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  width: 80%;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Buttons */
+.upload-button, .cancel-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload {
+  padding: 30px;
+  align-items: center;
+  justify-content: center;
+} 
+
+.capsule-button {
+  margin-bottom: 30px;
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 100px;
+}
+
+.capsule {
+  align-items: center;
 }

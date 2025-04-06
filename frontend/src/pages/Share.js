@@ -34,11 +34,7 @@ export default function Share() {
         const newAlbum = {
             albumID: albumName.toLowerCase().replace(' ', '_'), // Example albumID generation
             name: albumName,
-            pictures: [{
-                picturePath: '', // Default image
-                comments: [],
-                pictureID: '1' // Example pictureID
-            }],
+            pictures: [],
             collaborators: collaboratorList
         };
 
