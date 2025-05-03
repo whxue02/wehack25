@@ -1,4 +1,4 @@
-## wehack25 2nd Place Design Winner
+## WeHack '25 UI/UX Track Winner
 
 ## 🌟 Inspiration  
 I created **Chronicle** because I often found myself forgetting the small, beautiful moments in life. I wanted a way to capture and revisit those memories—not just individually, but with friends and family too. The idea of shared albums and a time capsule feature felt like the perfect way to document experiences and relive them together.
