@@ -4,7 +4,7 @@
 I created **Chronicle** because I often found myself forgetting the small, beautiful moments in life. I wanted a way to capture and revisit those memories, not just individually, but with friends and family too. The idea of shared albums and a time capsule feature felt like the perfect way to document experiences and relive them together.
 
 ## 📸 What it does  
-Chronicle is a photo-sharing app that allows users to create and contribute to shared albums, leave comments on photos, and store memories in a special *time capsule*—a feature that locks photos until a future date, bringing back memories in a meaningful way.
+Chronicle is a photo-sharing app that allows users to create and contribute to shared albums, leave comments on photos, and store memories in a special *time capsule*, a feature that locks photos until a future date, bringing back memories in a meaningful way.
 
 ## 🛠️ How we built it  
 I built Chronicle using **React** for the frontend, **Flask** for the backend, and **MongoDB** as the database. Each component interacts to handle photo uploads, album management, commenting, and the time capsule feature. The app is structured to handle nested data within MongoDB, especially for features like album sharing and comment threads.
