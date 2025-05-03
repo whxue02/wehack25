@@ -1,7 +1,7 @@
 ## WeHack '25 UI/UX Track Winner
 
 ## 🌟 Inspiration  
-I created **Chronicle** because I often found myself forgetting the small, beautiful moments in life. I wanted a way to capture and revisit those memories—not just individually, but with friends and family too. The idea of shared albums and a time capsule feature felt like the perfect way to document experiences and relive them together.
+I created **Chronicle** because I often found myself forgetting the small, beautiful moments in life. I wanted a way to capture and revisit those memories, not just individually, but with friends and family too. The idea of shared albums and a time capsule feature felt like the perfect way to document experiences and relive them together.
 
 ## 📸 What it does  
 Chronicle is a photo-sharing app that allows users to create and contribute to shared albums, leave comments on photos, and store memories in a special *time capsule*—a feature that locks photos until a future date, bringing back memories in a meaningful way.
